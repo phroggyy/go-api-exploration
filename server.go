@@ -5,8 +5,8 @@ import (
     "github.com/gin-gonic/gin"
     "net/http"
     "log"
-    "github.com/phroggyy/apitest/models"
-    "github.com/phroggyy/apitest/persistence"
+    "github.com/phroggyy/go-api-exploration/models"
+    "github.com/phroggyy/go-api-exploration/persistence"
 )
 
 func main() {

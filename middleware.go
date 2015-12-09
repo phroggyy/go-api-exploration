@@ -1,7 +1,7 @@
 package main
 
 import (
-    "github.com/phroggyy/apitest/persistence"
+    "github.com/phroggyy/go-api-exploration/persistence"
 )
 
 type Controller struct {
