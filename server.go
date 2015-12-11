@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "os"
     "github.com/gin-gonic/gin"
     "net/http"
     "log"
@@ -10,6 +11,10 @@ import (
 )
 
 func main() {
+    port := "80"
+    if len(os.Args) == 2 {
+        port = os.Args[1]
+    }
     fmt.Print("Starting WebSockets...\n")
     go h.run()
     fmt.Print("Starting Gin...\n")
@@ -46,7 +51,7 @@ func main() {
     db.DB.Create(&models.User{Name:"Jane Doe",Email:"jane.doe@example.com"})
 
     // Start the application
-    router.Run(":8080")
+    router.Run(":"+port)
 }
 
 func (ctl *Controller) ApiIndex(response *gin.Context) {
