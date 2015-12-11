@@ -9304,6 +9304,79 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],3:[function(require,module,exports){
+(function () {
+  var vue // lazy bind
+
+  var asyncData = {
+    created: function () {
+      if (!vue) {
+        console.warn('[vue-async-data] not installed!')
+        return
+      }
+      if (this.$options.asyncData) {
+        if (this._defineMeta) {
+          // 0.12 compat
+          this._defineMeta('$loadingAsyncData', true)
+        } else {
+          // ^1.0.0-alpha
+          vue.util.defineReactive(this, '$loadingAsyncData', true)
+        }
+      }
+    },
+    compiled: function () {
+      this.reloadAsyncData()
+    },
+    methods: {
+      reloadAsyncData: function () {
+        var load = this.$options.asyncData
+        if (load) {
+          var self = this
+          var resolve = function (data) {
+            if (data) {
+              for (var key in data) {
+                self.$set(key, data[key])
+              }
+            }
+            self.$loadingAsyncData = false
+            self.$emit('async-data')
+          }
+          var reject = function (reason) {
+            var msg = '[vue] async data load failed'
+            if (reason instanceof Error) {
+              console.warn(msg)
+              throw reason
+            } else {
+              console.warn(msg + ': ' + reason)
+            }
+          }
+          this.$loadingAsyncData = true
+          var res = load.call(this, resolve, reject)
+          if (res && typeof res.then === 'function') {
+            res.then(resolve, reject)
+          }
+        }
+      }
+    }
+  }
+
+  var api = {
+    mixin: asyncData,
+    install: function (Vue, options) {
+      vue = Vue
+      Vue.options = Vue.util.mergeOptions(Vue.options, asyncData)
+    }
+  }
+
+  if(typeof exports === 'object' && typeof module === 'object') {
+    module.exports = api
+  } else if(typeof define === 'function' && define.amd) {
+    define(function () { return api })
+  } else if (typeof window !== 'undefined') {
+    window.VueAsyncData = api
+  }
+})()
+
+},{}],4:[function(require,module,exports){
 var Vue // late bind
 var map = Object.create(null)
 var shimmed = false
@@ -9544,7 +9617,7 @@ function format (id) {
   return id.match(/[^\/]+\.vue$/)[0]
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /**
  * Service for sending network requests.
  */
@@ -9706,7 +9779,7 @@ module.exports = function (_) {
     return _.http = Http;
 };
 
-},{"./lib/jsonp":6,"./lib/promise":7,"./lib/xhr":9}],5:[function(require,module,exports){
+},{"./lib/jsonp":7,"./lib/promise":8,"./lib/xhr":10}],6:[function(require,module,exports){
 /**
  * Install plugin.
  */
@@ -9747,7 +9820,7 @@ if (window.Vue) {
 }
 
 module.exports = install;
-},{"./http":4,"./lib/util":8,"./resource":10,"./url":11}],6:[function(require,module,exports){
+},{"./http":5,"./lib/util":9,"./resource":11,"./url":12}],7:[function(require,module,exports){
 /**
  * JSONP request.
  */
@@ -9799,7 +9872,7 @@ module.exports = function (_, options) {
 
 };
 
-},{"./promise":7}],7:[function(require,module,exports){
+},{"./promise":8}],8:[function(require,module,exports){
 /**
  * Promises/A+ polyfill v1.1.0 (https://github.com/bramstein/promis)
  */
@@ -10011,7 +10084,7 @@ if (window.MutationObserver) {
 
 module.exports = window.Promise || Promise;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * Utility functions.
  */
@@ -10093,7 +10166,7 @@ module.exports = function (Vue) {
     return _;
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * XMLHttp request.
  */
@@ -10146,7 +10219,7 @@ module.exports = function (_, options) {
     return promise;
 };
 
-},{"./promise":7}],10:[function(require,module,exports){
+},{"./promise":8}],11:[function(require,module,exports){
 /**
  * Service for interacting with RESTful services.
  */
@@ -10259,7 +10332,7 @@ module.exports = function (_) {
     return _.resource = Resource;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /**
  * Service for URL templating.
  */
@@ -10418,7 +10491,7 @@ module.exports = function (_) {
     return _.url = Url;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 var babelHelpers = {};
@@ -12953,7 +13026,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 module.exports = Router;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (process){
 /*!
  * Vue.js v1.0.11
@@ -22353,7 +22426,7 @@ if (process.env.NODE_ENV !== 'production' && inBrowser) {
 
 module.exports = Vue;
 }).call(this,require('_process'))
-},{"_process":2}],14:[function(require,module,exports){
+},{"_process":2}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -22373,7 +22446,7 @@ exports.default = {
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div>\n    <nav-bar title=\"{{\" }}=\"\"></nav-bar>\n    <router-view></router-view>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div>\n    <nav-bar :title=\"title\"></nav-bar>\n    <router-view></router-view>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -22385,7 +22458,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"./components/NavBar.vue":16,"vue":13,"vue-hot-reload-api":3}],15:[function(require,module,exports){
+},{"./components/NavBar.vue":17,"vue":14,"vue-hot-reload-api":4}],16:[function(require,module,exports){
 'use strict';
 
 var _vue = require('vue');
@@ -22399,6 +22472,10 @@ var _vueRouter2 = _interopRequireDefault(_vueRouter);
 var _vueResource = require('vue-resource');
 
 var _vueResource2 = _interopRequireDefault(_vueResource);
+
+var _vueAsyncData = require('vue-async-data');
+
+var _vueAsyncData2 = _interopRequireDefault(_vueAsyncData);
 
 var _App = require('./App.vue');
 
@@ -22414,6 +22491,7 @@ window.$ = window.jQuery = require('jquery');
 
 _vue2.default.use(_vueResource2.default);
 _vue2.default.use(_vueRouter2.default);
+_vue2.default.use(_vueAsyncData2.default);
 _vue2.default.config.debug = true;
 
 var router = new _vueRouter2.default({
@@ -22430,7 +22508,7 @@ router.redirect({
 
 router.start(_App2.default, '#app');
 
-},{"./App.vue":14,"./views/Index.vue":17,"jquery":1,"vue":13,"vue-resource":5,"vue-router":12}],16:[function(require,module,exports){
+},{"./App.vue":15,"./views/Index.vue":18,"jquery":1,"vue":14,"vue-async-data":3,"vue-resource":6,"vue-router":13}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -22440,7 +22518,7 @@ exports.default = {
         props: ['title']
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n    <nav class=\"navbar navbar-default\" role=\"navigation\">\n        <!-- Brand and toggle get grouped for better mobile display -->\n        <div class=\"navbar-header\">\n            <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-ex1-collapse\">\n                <span class=\"sr-only\">Toggle navigation</span>\n                <span class=\"icon-bar\"></span>\n                <span class=\"icon-bar\"></span>\n                <span class=\"icon-bar\"></span>\n            </button>\n            <a class=\"navbar-brand\" href=\"#\">{{ title }}</a>\n        </div>\n    \n        <!-- Collect the nav links, forms, and other content for toggling -->\n        <div class=\"collapse navbar-collapse navbar-ex1-collapse\">\n            <ul class=\"nav navbar-nav\">\n                <li class=\"active\"><a href=\"#\">Link</a></li>\n                <li><a href=\"#\">Link</a></li>\n            </ul>\n            <form class=\"navbar-form navbar-left\" role=\"search\">\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Search\">\n                </div>\n                <button type=\"submit\" class=\"btn btn-default\">Submit</button>\n            </form>\n            <ul class=\"nav navbar-nav navbar-right\">\n                <li><a href=\"#\">Link</a></li>\n                <li class=\"dropdown\">\n                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">Dropdown <b class=\"caret\"></b></a>\n                    <ul class=\"dropdown-menu\">\n                        <li><a href=\"#\">Action</a></li>\n                        <li><a href=\"#\">Another action</a></li>\n                        <li><a href=\"#\">Something else here</a></li>\n                        <li><a href=\"#\">Separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n        </div><!-- /.navbar-collapse -->\n    </nav>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row\">\n    <div class=\"top-bar\" style=\"width: 100%\">\n        <img src=\"img/topbar.jpg\" style=\"min-width: 100%; background-position: 50% 50%; min-height: 250px\">\n        <h1 class=\"text-center text-white\" style=\"margin-top: -20rem;\">Leo Sjöberg</h1>\n        <div class=\"col-xs-6 col-sm-4 col-md-2 col-xs-offset-3 col-sm-offset-4 col-md-offset-5\">\n            <img src=\"img/profile.jpg\" alt=\"Profile picture\" class=\"img-circle col-xs-12\">\n        </div>\n    </div>\n</div>\n    \n    <!-- <nav class=\"navbar navbar-default\" role=\"navigation\">\n        <div class=\"navbar-header\">\n            <button type=\"button\" class=\"navbar-toggle\" data-toggle=\"collapse\" data-target=\".navbar-ex1-collapse\">\n                <span class=\"sr-only\">Toggle navigation</span>\n                <span class=\"icon-bar\"></span>\n                <span class=\"icon-bar\"></span>\n                <span class=\"icon-bar\"></span>\n            </button>\n            <a class=\"navbar-brand\" href=\"#\">{{ title }}</a>\n        </div>\n    \n        <div class=\"collapse navbar-collapse navbar-ex1-collapse\">\n            <ul class=\"nav navbar-nav\">\n                <li class=\"active\"><a href=\"#\">Link</a></li>\n                <li><a href=\"#\">Link</a></li>\n            </ul>\n            <form class=\"navbar-form navbar-left\" role=\"search\">\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" placeholder=\"Search\">\n                </div>\n                <button type=\"submit\" class=\"btn btn-default\">Submit</button>\n            </form>\n            <ul class=\"nav navbar-nav navbar-right\">\n                <li><a href=\"#\">Link</a></li>\n                <li class=\"dropdown\">\n                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">Dropdown <b class=\"caret\"></b></a>\n                    <ul class=\"dropdown-menu\">\n                        <li><a href=\"#\">Action</a></li>\n                        <li><a href=\"#\">Another action</a></li>\n                        <li><a href=\"#\">Something else here</a></li>\n                        <li><a href=\"#\">Separated link</a></li>\n                    </ul>\n                </li>\n            </ul>\n        </div>\n    </nav> -->\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -22452,23 +22530,35 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":13,"vue-hot-reload-api":3}],17:[function(require,module,exports){
+},{"vue":14,"vue-hot-reload-api":4}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = {
+    ready: function ready() {
+        var _this = this;
+
+        $('#skills-tabs a').click(function (e) {
+            e.preventDefault();
+            $(_this).tab('show');
+        });
+    },
     data: function data() {
-        var users;
+        return {
+            users: {},
+            loading: true
+        };
+    },
+    asyncData: function asyncData() {
         return this.$http.get('http://localhost:8080/api', function (data) {
-            console.log(data);
             return { users: data };
         });
     }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"container\">\n    <h1 class=\"text-center\">Welcome to a Go Test</h1>\n    <h2 class=\"text-center\">We have a few users of our application</h2>\n    <table class=\"table\">\n        <thead>\n            <tr>\n                <th>Name</th>\n                <th>Email</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr v-for=\"user in users\">\n                <td>{{ user.name }}</td>\n                <td>{{ user.email }}</td>\n            </tr>\n        </tbody>\n    </table>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"container\">\n    <div class=\"row\">\n        <div class=\"col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3\">\n            <h2 class=\"text-center\">Hi.</h2>\n            <p class=\"text-justify\">\n                I’m Leo, a developer from Stockholm, Sweden. I am currently studying for my bachelor’s degree in computer sciences at the University of Uppsala, in Uppsala, Sweden. I am primarily a web developer and have fairly extensive experience with PHP, as well as several frontend tools. However, I am always interested in learning new concepts and new programming languages, so I know a few other things too...\n            </p>\n        </div>\n    </div>\n    <div class=\"row\">\n        <div class=\"col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3\">\n        <h2 class=\"text-center\">Stuff I know</h2>\n            <ul class=\"nav nav-tabs nav-justified\" id=\"skills-tabs\">\n                <li role=\"presentation\" class=\"active\"><a href=\"#web\" aria-controls=\"home\" data-toggle=\"tab\">Web stuff</a></li>\n                <li role=\"presentation\"><a href=\"#other\" aria-controls=\"other\" data-toggle=\"tab\">Other stuff</a></li>\n            </ul>\n            <div class=\"tab-content\">\n                <div class=\"tab-pane active\" id=\"web\">Something</div>\n                <div class=\"tab-pane\" id=\"other\">Something else</div>\n            </div>\n        </div>\n    </div>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -22480,6 +22570,6 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":13,"vue-hot-reload-api":3}]},{},[15]);
+},{"vue":14,"vue-hot-reload-api":4}]},{},[16]);
 
 //# sourceMappingURL=app.js.map
