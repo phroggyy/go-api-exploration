@@ -11,10 +11,14 @@
     <div class="row">
         <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
         <h2 class="text-center">Stuff I know</h2>
-            <ul class="nav nav-tabs nav-justified">
-                <li role="presentation" class="active"><a href="#">Web stuff</a></li>
-                <li role="presentation"><a href="#">Other stuff</a></li>
+            <ul class="nav nav-tabs nav-justified" id="skills-tabs">
+                <li role="presentation" class="active"><a href="#web" aria-controls="home" data-toggle="tab">Web stuff</a></li>
+                <li role="presentation"><a href="#other" aria-controls="other" data-toggle="tab">Other stuff</a></li>
             </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="web">Something</div>
+                <div class="tab-pane" id="other">Something else</div>
+            </div>
         </div>
     </div>
 </div>
@@ -22,6 +26,12 @@
 
 <script>
     export default {
+        ready() {
+            $('#skills-tabs a').click((e) => {
+                e.preventDefault()
+                $(this).tab('show')
+            })
+        },
         data() {
             return {
                 users: {},
