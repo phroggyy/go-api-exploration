@@ -1,6 +1,6 @@
 <template>
 <div>
-    <nav-bar title={{ title }}></nav-bar>
+    <nav-bar :title="title"></nav-bar>
     <router-view></router-view>
 </div>
 </template>

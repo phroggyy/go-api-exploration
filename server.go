@@ -35,8 +35,10 @@ func main() {
     router.GET("/stream", ctl.Stream)
     fmt.Print("Routes initialised...\n")
 
-    router.Static("/js", "./frontend/public/js");
-    router.LoadHTMLFiles("frontend/public/index.html");
+    router.Static("/js", "./frontend/public/js")
+    router.Static("/css", "./frontend/public/css")
+    router.Static("/img", "./frontend/public/img")
+    router.LoadHTMLFiles("frontend/public/index.html")
 
     // Seed our database with one user.
     db.DB.DropTableIfExists(&models.User{}).CreateTable(&models.User{})

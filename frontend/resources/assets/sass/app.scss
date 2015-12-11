@@ -1,0 +1,49 @@
+$font-family-sans-serif: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$headings-font-weight: 300;
+$font-size-base: 18px;
+$font-size-h1: floor($font-size-base * 4);
+$font-size-h2: floor($font-size-base * 2.5);
+$nav-tabs-border-color: #f1d9b7;
+$nav-tabs-active-link-hover-border-color: #e3a958;
+$line-height-base: 1.8;
+@import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+.text-white {
+    color: #fff;
+}
+
+.nav-tabs {
+    &.nav-justified {
+        border-bottom: 1px solid $nav-tabs-border-color;
+        > .active {
+            > a {
+                &,
+                &:hover,
+                &:focus {
+                    border: none;
+                    border-bottom-color: initial;
+                    border-bottom: 1px solid $nav-tabs-active-link-hover-border-color;
+                    cursor: default;
+              }
+            }
+        }
+    }
+  > li {
+    // > a {
+    //   border-radius: $border-radius-base $border-radius-base 0 0;
+    //   &:hover {
+    //     border-color: $nav-tabs-link-hover-border-color $nav-tabs-link-hover-border-color $nav-tabs-border-color;
+    //   }
+    // }
+
+    // Active state, and its :hover to override normal :hover
+    &.active > a {
+      &,
+      &:hover,
+      &:focus {
+        border: none;
+        border-bottom: 1px solid $nav-tabs-active-link-hover-border-color;
+        cursor: default;
+      }
+    }
+  }
+}
