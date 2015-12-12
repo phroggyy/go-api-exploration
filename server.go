@@ -8,6 +8,7 @@ import (
     "github.com/gin-gonic/gin"
     "net/http"
     "log"
+    "github.com/gin-gonic/contrib/gzip"
     "github.com/phroggyy/go-api-exploration/models"
     "github.com/phroggyy/go-api-exploration/persistence"
 )
@@ -48,6 +49,7 @@ func main() {
     go h.run()
     fmt.Print("Starting Gin...\n")
     router := gin.Default()
+    router.Use(gzip.Gzip(gzip.DefaultCompression))
 
     db, err := persistence.Start()
     if err != nil {
