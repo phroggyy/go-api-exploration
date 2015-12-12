@@ -31,17 +31,6 @@
                 e.preventDefault()
                 $(this).tab('show')
             })
-        },
-        data() {
-            return {
-                users: {},
-                loading: true
-            }
-        },
-        asyncData() {
-            return this.$http.get('http://localhost:8080/api', (data) => {
-                return {users:data}
-            })
         }
     }
 </script>

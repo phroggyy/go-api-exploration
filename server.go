@@ -2,6 +2,8 @@ package main
 
 import (
     "fmt"
+    "flag"
+    "strings"
     "os"
     "github.com/gin-gonic/gin"
     "net/http"
@@ -10,11 +12,40 @@ import (
     "github.com/phroggyy/go-api-exploration/persistence"
 )
 
+var siteName string
+
 func main() {
-    port := "80"
-    if len(os.Args) == 2 {
-        port = os.Args[1]
+    // Declare our flags
+    var safeMode bool
+    var certFile string
+    var keyFile  string
+    var port     string
+    flag.BoolVar(&safeMode, "safe", false, "Sets whether the application should be served over https or not")
+    flag.StringVar(&certFile, "cert", "./cert.pem", "Set the certificate file to be used")
+    flag.StringVar(&keyFile, "key", "./privkey.pem", "Set the private key to be used")
+    flag.StringVar(&port, "p", "80", "Set the port to run on")
+    flag.Parse()
+    fmt.Println("cert is " + certFile)
+
+    // If the user left the cert and keyfiles default, ask if they're sure...
+    if safeMode && certFile == "./cert.pem" && keyFile == "./privkey.pem" {
+        fmt.Println("You didn't provide a location for your certificate and/or private key. We will try to use \"./cert/pem\" and \"./privkey.pem\" respectively.\nAre you sure you want to continue?\n")
+        var answer string
+        certain := false
+        for ;!certain; {
+            fmt.Scanln(&answer)
+            answer = strings.ToLower(answer)
+            if answer == "y" || answer == "yes" {
+                certain = true
+            } else if answer == "n" || answer == "no" {
+                certain = false
+                os.Exit(0)
+            } else {
+                fmt.Println("You did not provide a valid answer. Please try again.\n")
+            }
+        }
     }
+
     fmt.Print("Starting WebSockets...\n")
     go h.run()
     fmt.Print("Starting Gin...\n")
@@ -45,13 +76,24 @@ func main() {
     router.Static("/img", "./frontend/public/img")
     router.LoadHTMLFiles("frontend/public/index.html")
 
-    // Seed our database with one user.
+    // Seed our database with two users.
     db.DB.DropTableIfExists(&models.User{}).CreateTable(&models.User{})
     db.DB.Create(&models.User{Name:"John Doe",Email:"john.doe@example.com"})
     db.DB.Create(&models.User{Name:"Jane Doe",Email:"jane.doe@example.com"})
 
-    // Start the application
-    router.Run(":"+port)
+    if safeMode {
+        // Start the application on HTTP in a goroutine
+        go http.ListenAndServe(":80", http.HandlerFunc(redir))
+        // Only respond to https
+        router.Run(":443")
+    } else {
+        // Start the application
+        router.Run(":"+port)
+    }
+}
+
+func redir(w http.ResponseWriter, req *http.Request) {
+    http.Redirect(w, req, "https://"+siteName+req.RequestURI, http.StatusMovedPermanently)
 }
 
 func (ctl *Controller) ApiIndex(response *gin.Context) {

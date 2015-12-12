@@ -11,7 +11,7 @@
     export default {
         data() {
             return {
-                title: "Go API Test"
+                title: "Leo Sjöberg"
             }
         },
         components: {
