@@ -12,7 +12,7 @@ import (
     "github.com/phroggyy/go-api-exploration/persistence"
 )
 
-var siteName string
+siteName := "leosjoberg.com"
 
 func main() {
     // Declare our flags
