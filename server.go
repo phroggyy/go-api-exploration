@@ -83,7 +83,7 @@ func main() {
         // Start the application on HTTP in a goroutine
         go http.ListenAndServe(":80", http.HandlerFunc(redir))
         // Only respond to https
-        router.Run(":443")
+        router.RunTLS(":443", certFile, keyFile)
     } else {
         // Start the application
         router.Run(":"+port)
