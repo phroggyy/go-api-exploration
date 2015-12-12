@@ -58,6 +58,9 @@ $line-height-base: 1.8;
  */
 
 .top-bar {
+    @media screen and (max-width: 480px) {
+        height: 340px;
+    }
     height: 250px;
     background: url("/img/topbar.jpg");
     background-position: 50% 50%;
