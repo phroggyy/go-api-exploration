@@ -12,8 +12,6 @@ import (
     "github.com/phroggyy/go-api-exploration/persistence"
 )
 
-siteName := "leosjoberg.com"
-
 func main() {
     // Declare our flags
     var safeMode bool
@@ -93,7 +91,7 @@ func main() {
 }
 
 func redir(w http.ResponseWriter, req *http.Request) {
-    http.Redirect(w, req, "https://"+siteName+req.RequestURI, http.StatusMovedPermanently)
+    http.Redirect(w, req, "https://leosjoberg.com"+req.RequestURI, http.StatusMovedPermanently)
 }
 
 func (ctl *Controller) ApiIndex(response *gin.Context) {
