@@ -13,8 +13,12 @@
         ready() {
             var img = $('#profile-pic')
             img.css("position", "absolute")
-            
-            img.css("top", $('#main-top').height() - img.height() / 2)
+            // For some reason, it appears the image isn't properly
+            // loaded before the script runs, so we just delay it
+            // by 20 millisecs.
+            window.setTimeout(() => {
+                img.css("top", $('#main-top').height() - img.height() / 2)
+            }, 20)
         }
     }
 </script>
