@@ -15,10 +15,10 @@
             img.css("position", "absolute")
             // For some reason, it appears the image isn't properly
             // loaded before the script runs, so we just delay it
-            // by 20 millisecs.
+            // by 50 millisecs.
             window.setTimeout(() => {
                 img.css("top", $('#main-top').height() - img.height() / 2)
-            }, 20)
+            }, 50)
         }
     }
 </script>
